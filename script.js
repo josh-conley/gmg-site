@@ -53,6 +53,61 @@ let isDraggingHandle = false;
 let currentHandle = null;
 let activeTeam = null; // Track which team is currently highlighted
 
+// Gradient calculation functions for range bars
+function getRankColorFromNormalized(normalized) {
+    let red, green, blue = 0;
+    
+    if (normalized <= 0.5) {
+        // Green to yellow (ranks 1-16)
+        red = Math.round(255 * (normalized * 2));
+        green = 255;
+    } else {
+        // Yellow to red (ranks 17-32)
+        red = 255;
+        green = Math.round(255 * (1 - (normalized - 0.5) * 2));
+    }
+    
+    return `rgb(${red}, ${green}, ${blue})`;
+}
+
+function getRankGradient(highRank, lowRank) {
+    // Create gradient stops based on actual positions within 1-32 scale
+    const stops = [];
+    
+    // Always use the full 1-32 range for color calculations
+    const totalRange = 31; // 32 - 1
+    
+    // Calculate color for high rank (top of range bar)
+    const highNormalized = (highRank - 1) / totalRange;
+    const highColor = getRankColorFromNormalized(highNormalized);
+    stops.push(`${highColor} 0%`);
+    
+    console.log(`GRADIENT DEBUG: High rank ${highRank} -> normalized ${highNormalized} -> color ${highColor}`);
+    
+    // If there's enough range, add intermediate stops
+    const rangeSpan = lowRank - highRank;
+    if (rangeSpan > 10) {
+        // Add a middle stop
+        const midRank = (highRank + lowRank) / 2;
+        const midNormalized = (midRank - 1) / totalRange;
+        const midColor = getRankColorFromNormalized(midNormalized);
+        stops.push(`${midColor} 50%`);
+        console.log(`GRADIENT DEBUG: Mid rank ${midRank} -> normalized ${midNormalized} -> color ${midColor}`);
+    }
+    
+    // Calculate color for low rank (bottom of range bar)
+    const lowNormalized = (lowRank - 1) / totalRange;
+    const lowColor = getRankColorFromNormalized(lowNormalized);
+    stops.push(`${lowColor} 100%`);
+    
+    console.log(`GRADIENT DEBUG: Low rank ${lowRank} -> normalized ${lowNormalized} -> color ${lowColor}`);
+    
+    const gradient = `linear-gradient(to bottom, ${stops.join(', ')})`;
+    console.log(`GRADIENT DEBUG: Final gradient: ${gradient}`);
+    
+    return gradient;
+}
+
 // Initialize team data
 function initializeTeamData() {
     nflTeams.forEach(team => {
@@ -347,6 +402,13 @@ function updateTeamRangePosition(teamName) {
     const rangeBar = teamElement.querySelector('.range-bar');
     rangeBar.style.top = `${highPos}px`;
     rangeBar.style.height = `${Math.max(2, lowPos - highPos)}px`;
+    
+    // Apply the calculated gradient
+    const gradient = getRankGradient(data.high, data.low);
+    rangeBar.style.setProperty('background-image', gradient, 'important');
+    
+    console.log(`GRADIENT: ${teamName} ranks ${data.high}-${data.low} -> ${gradient}`);
+    
     
     // Update handles (center them on the calculated position)
     const handleHeight = 16; // Standard handle height
@@ -777,8 +839,19 @@ function handleResize() {
     });
 }
 
+// Test gradient calculation function
+function testGradient() {
+    console.log("=== GRADIENT TESTS ===");
+    console.log("Default team (8-24):", getRankGradient(8, 24));
+    console.log("Top team (1-5):", getRankGradient(1, 5));
+    console.log("Bottom team (28-32):", getRankGradient(28, 32));
+    console.log("Mid team (15-18):", getRankGradient(15, 18));
+    console.log("=== END TESTS ===");
+}
+
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
+    testGradient();
     loadData();
     
     // Event listeners
