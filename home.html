@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GMG Site</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +15,7 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Barlow', sans-serif;
             background: #27a86b;
             color: white;
             min-height: 100vh;
@@ -47,41 +50,42 @@
 
         .nav-links {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
         .nav-link {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
             padding: 15px 30px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             text-decoration: none;
             border-radius: 10px;
-            border: 2px solid transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
-            font-weight: bold;
+            font-family: 'Barlow', sans-serif;
+            font-weight: 600;
             font-size: 1.1em;
         }
 
+        .nav-link-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
         .nav-link:hover {
-            background: rgba(76, 175, 80, 0.2);
-            border-color: rgba(76, 175, 80, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .nav-link.primary {
-            background: rgba(0, 0, 0, 0.8);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-
-        .nav-link.primary:hover {
             background: rgba(0, 0, 0, 0.9);
             border-color: rgba(255, 255, 255, 0.5);
-            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .footer {
@@ -98,7 +102,17 @@
         <h1>Green Means Go</h1>
         
         <div class="nav-links">
-            <a href="/rankings" class="nav-link primary">NFL Rankings Tool</a>
+            <a href="https://www.youtube.com/@greenmeansgosports" target="_blank" class="nav-link">
+                <img src="/assets/youtube-logo.png" alt="YouTube" class="nav-link-icon">
+                YouTube Channel
+            </a>
+            <a href="https://www.patreon.com/c/GMGsports/posts" target="_blank" class="nav-link">
+                <img src="/assets/patreon-logo.png" alt="Patreon" class="nav-link-icon">
+                Patreon
+            </a>
+            <a href="/rankings" class="nav-link">
+                🏈 NFL Rankings Tool
+            </a>
         </div>
     </div>
     
