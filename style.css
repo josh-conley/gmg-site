@@ -66,13 +66,6 @@ button:hover {
     backdrop-filter: blur(10px);
     display: flex;
     min-height: 600px;
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    transition: border-color 0.3s ease;
-}
-
-.chart-container.drag-over {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.15);
 }
 
 .y-axis {
@@ -116,14 +109,14 @@ button:hover {
     height: 100%;
     display: flex;
     align-items: flex-end;
-    gap: 4px;
+    gap: 2px;
     padding: 10px;
     min-height: 500px;
 }
 
 .team-range {
     position: relative;
-    width: 40px;
+    width: 32px;
     height: 100%;
     cursor: pointer;
     user-select: none;
@@ -150,6 +143,20 @@ button:hover {
     justify-content: center;
     font-size: 8px;
     font-weight: bold;
+    background: white;
+    overflow: hidden;
+}
+
+.team-logo-img-small {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.team-logo-small.text-fallback {
+    background: #f0f0f0;
+    color: #333;
 }
 
 .team-name-small {
@@ -214,10 +221,43 @@ button:hover {
 
 .range-handle.avg {
     border-color: rgba(255, 193, 7, 0.4);
-    background: rgba(255, 193, 7, 0.4);
-    width: 20px;
-    height: 20px;
+    background: white;
+    width: 36px;
+    height: auto;
+    border-radius: 6px;
     z-index: 11;
+    padding: 2px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transform: translateX(-50%);
+}
+
+.team-avg-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-height: 32px;
+}
+
+.avg-logo-img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.avg-team-name {
+    font-size: 7px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    line-height: 1;
+}
+
+.team-avg-slider.text-only-avg {
+    justify-content: center;
+    background: rgba(255, 193, 7, 0.9);
+    color: white;
 }
 
 .range-handle.low {
@@ -237,9 +277,15 @@ button:hover {
 
 .team-range.active .range-handle.avg {
     border-color: #FFC107;
-    background: #FFC107;
-    box-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+    background: white;
+    box-shadow: 0 0 16px rgba(255, 193, 7, 0.6);
     transform: translateX(-50%) scale(1.1);
+    border-width: 3px;
+}
+
+.team-range.active .avg-team-name {
+    color: #333;
+    font-weight: bold;
 }
 
 .team-range.active .range-handle.low {
@@ -273,11 +319,22 @@ button:hover {
     border-color: #4CAF50;
 }
 
-.legend-icon.avg {
-    background: #FFC107;
-    border-color: #FFC107;
-    width: 20px;
+.legend-icon.avg-new {
+    background: white;
+    border: 2px solid #FFC107;
+    width: 32px;
     height: 20px;
+    border-radius: 4px;
+    position: relative;
+}
+
+.legend-icon.avg-new::after {
+    content: "🏈";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
 }
 
 .legend-icon.low {
@@ -313,7 +370,7 @@ button:hover {
     padding: 8px;
     border-radius: 8px;
     text-align: center;
-    cursor: grab;
+    cursor: pointer;
     transition: all 0.3s ease;
     user-select: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -326,27 +383,37 @@ button:hover {
 .team:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: #f8f9fa;
 }
 
 .team:active {
-    cursor: grabbing;
-}
-
-.team.dragging {
-    opacity: 0.5;
-    transform: rotate(2deg);
+    transform: translateY(0px);
+    transform: scale(0.95);
 }
 
 .team-logo {
     width: 32px;
     height: 32px;
-    background: #f0f0f0;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     font-size: 10px;
+    background: white;
+    overflow: hidden;
+}
+
+.team-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.team-logo.text-fallback {
+    background: #f0f0f0;
+    color: #333;
 }
 
 .team-name {
@@ -354,70 +421,70 @@ button:hover {
     font-weight: bold;
 }
 
-/* Team Colors */
-.team[data-team="Cardinals"] .team-logo { background: #97233F; color: white; }
-.team[data-team="Falcons"] .team-logo { background: #A71930; color: white; }
-.team[data-team="Ravens"] .team-logo { background: #241773; color: white; }
-.team[data-team="Bills"] .team-logo { background: #00338D; color: white; }
-.team[data-team="Panthers"] .team-logo { background: #0085CA; color: white; }
-.team[data-team="Bears"] .team-logo { background: #0B162A; color: white; }
-.team[data-team="Bengals"] .team-logo { background: #FB4F14; color: white; }
-.team[data-team="Browns"] .team-logo { background: #311D00; color: white; }
-.team[data-team="Cowboys"] .team-logo { background: #003594; color: white; }
-.team[data-team="Broncos"] .team-logo { background: #FB4F14; color: white; }
-.team[data-team="Lions"] .team-logo { background: #0076B6; color: white; }
-.team[data-team="Packers"] .team-logo { background: #203731; color: white; }
-.team[data-team="Texans"] .team-logo { background: #03202F; color: white; }
-.team[data-team="Colts"] .team-logo { background: #002C5F; color: white; }
-.team[data-team="Jaguars"] .team-logo { background: #006778; color: white; }
-.team[data-team="Chiefs"] .team-logo { background: #E31837; color: white; }
-.team[data-team="Raiders"] .team-logo { background: #000000; color: white; }
-.team[data-team="Chargers"] .team-logo { background: #0080C6; color: white; }
-.team[data-team="Rams"] .team-logo { background: #003594; color: white; }
-.team[data-team="Dolphins"] .team-logo { background: #008E97; color: white; }
-.team[data-team="Vikings"] .team-logo { background: #4F2683; color: white; }
-.team[data-team="Patriots"] .team-logo { background: #002244; color: white; }
-.team[data-team="Saints"] .team-logo { background: #D3BC8D; color: black; }
-.team[data-team="Giants"] .team-logo { background: #0B2265; color: white; }
-.team[data-team="Jets"] .team-logo { background: #125740; color: white; }
-.team[data-team="Eagles"] .team-logo { background: #004C54; color: white; }
-.team[data-team="Steelers"] .team-logo { background: #FFB612; color: black; }
-.team[data-team="49ers"] .team-logo { background: #AA0000; color: white; }
-.team[data-team="Seahawks"] .team-logo { background: #002244; color: white; }
-.team[data-team="Buccaneers"] .team-logo { background: #D50A0A; color: white; }
-.team[data-team="Titans"] .team-logo { background: #0C2340; color: white; }
-.team[data-team="Commanders"] .team-logo { background: #5A1414; color: white; }
+/* Team Colors - fallback for text logos only */
+.team[data-team="Cardinals"] .team-logo.text-fallback { background: #97233F; color: white; }
+.team[data-team="Falcons"] .team-logo.text-fallback { background: #A71930; color: white; }
+.team[data-team="Ravens"] .team-logo.text-fallback { background: #241773; color: white; }
+.team[data-team="Bills"] .team-logo.text-fallback { background: #00338D; color: white; }
+.team[data-team="Panthers"] .team-logo.text-fallback { background: #0085CA; color: white; }
+.team[data-team="Bears"] .team-logo.text-fallback { background: #0B162A; color: white; }
+.team[data-team="Bengals"] .team-logo.text-fallback { background: #FB4F14; color: white; }
+.team[data-team="Browns"] .team-logo.text-fallback { background: #311D00; color: white; }
+.team[data-team="Cowboys"] .team-logo.text-fallback { background: #003594; color: white; }
+.team[data-team="Broncos"] .team-logo.text-fallback { background: #FB4F14; color: white; }
+.team[data-team="Lions"] .team-logo.text-fallback { background: #0076B6; color: white; }
+.team[data-team="Packers"] .team-logo.text-fallback { background: #203731; color: white; }
+.team[data-team="Texans"] .team-logo.text-fallback { background: #03202F; color: white; }
+.team[data-team="Colts"] .team-logo.text-fallback { background: #002C5F; color: white; }
+.team[data-team="Jaguars"] .team-logo.text-fallback { background: #006778; color: white; }
+.team[data-team="Chiefs"] .team-logo.text-fallback { background: #E31837; color: white; }
+.team[data-team="Raiders"] .team-logo.text-fallback { background: #000000; color: white; }
+.team[data-team="Chargers"] .team-logo.text-fallback { background: #0080C6; color: white; }
+.team[data-team="Rams"] .team-logo.text-fallback { background: #003594; color: white; }
+.team[data-team="Dolphins"] .team-logo.text-fallback { background: #008E97; color: white; }
+.team[data-team="Vikings"] .team-logo.text-fallback { background: #4F2683; color: white; }
+.team[data-team="Patriots"] .team-logo.text-fallback { background: #002244; color: white; }
+.team[data-team="Saints"] .team-logo.text-fallback { background: #D3BC8D; color: black; }
+.team[data-team="Giants"] .team-logo.text-fallback { background: #0B2265; color: white; }
+.team[data-team="Jets"] .team-logo.text-fallback { background: #125740; color: white; }
+.team[data-team="Eagles"] .team-logo.text-fallback { background: #004C54; color: white; }
+.team[data-team="Steelers"] .team-logo.text-fallback { background: #FFB612; color: black; }
+.team[data-team="49ers"] .team-logo.text-fallback { background: #AA0000; color: white; }
+.team[data-team="Seahawks"] .team-logo.text-fallback { background: #002244; color: white; }
+.team[data-team="Buccaneers"] .team-logo.text-fallback { background: #D50A0A; color: white; }
+.team[data-team="Titans"] .team-logo.text-fallback { background: #0C2340; color: white; }
+.team[data-team="Commanders"] .team-logo.text-fallback { background: #5A1414; color: white; }
 
-/* Range chart team colors */
-.team-range[data-team="Cardinals"] .team-logo-small { background: #97233F; color: white; }
-.team-range[data-team="Falcons"] .team-logo-small { background: #A71930; color: white; }
-.team-range[data-team="Ravens"] .team-logo-small { background: #241773; color: white; }
-.team-range[data-team="Bills"] .team-logo-small { background: #00338D; color: white; }
-.team-range[data-team="Panthers"] .team-logo-small { background: #0085CA; color: white; }
-.team-range[data-team="Bears"] .team-logo-small { background: #0B162A; color: white; }
-.team-range[data-team="Bengals"] .team-logo-small { background: #FB4F14; color: white; }
-.team-range[data-team="Browns"] .team-logo-small { background: #311D00; color: white; }
-.team-range[data-team="Cowboys"] .team-logo-small { background: #003594; color: white; }
-.team-range[data-team="Broncos"] .team-logo-small { background: #FB4F14; color: white; }
-.team-range[data-team="Lions"] .team-logo-small { background: #0076B6; color: white; }
-.team-range[data-team="Packers"] .team-logo-small { background: #203731; color: white; }
-.team-range[data-team="Texans"] .team-logo-small { background: #03202F; color: white; }
-.team-range[data-team="Colts"] .team-logo-small { background: #002C5F; color: white; }
-.team-range[data-team="Jaguars"] .team-logo-small { background: #006778; color: white; }
-.team-range[data-team="Chiefs"] .team-logo-small { background: #E31837; color: white; }
-.team-range[data-team="Raiders"] .team-logo-small { background: #000000; color: white; }
-.team-range[data-team="Chargers"] .team-logo-small { background: #0080C6; color: white; }
-.team-range[data-team="Rams"] .team-logo-small { background: #003594; color: white; }
-.team-range[data-team="Dolphins"] .team-logo-small { background: #008E97; color: white; }
-.team-range[data-team="Vikings"] .team-logo-small { background: #4F2683; color: white; }
-.team-range[data-team="Patriots"] .team-logo-small { background: #002244; color: white; }
-.team-range[data-team="Saints"] .team-logo-small { background: #D3BC8D; color: black; }
-.team-range[data-team="Giants"] .team-logo-small { background: #0B2265; color: white; }
-.team-range[data-team="Jets"] .team-logo-small { background: #125740; color: white; }
-.team-range[data-team="Eagles"] .team-logo-small { background: #004C54; color: white; }
-.team-range[data-team="Steelers"] .team-logo-small { background: #FFB612; color: black; }
-.team-range[data-team="49ers"] .team-logo-small { background: #AA0000; color: white; }
-.team-range[data-team="Seahawks"] .team-logo-small { background: #002244; color: white; }
-.team-range[data-team="Buccaneers"] .team-logo-small { background: #D50A0A; color: white; }
-.team-range[data-team="Titans"] .team-logo-small { background: #0C2340; color: white; }
-.team-range[data-team="Commanders"] .team-logo-small { background: #5A1414; color: white; }
+/* Range chart team colors - fallback for text logos only */
+.team-range[data-team="Cardinals"] .team-logo-small.text-fallback { background: #97233F; color: white; }
+.team-range[data-team="Falcons"] .team-logo-small.text-fallback { background: #A71930; color: white; }
+.team-range[data-team="Ravens"] .team-logo-small.text-fallback { background: #241773; color: white; }
+.team-range[data-team="Bills"] .team-logo-small.text-fallback { background: #00338D; color: white; }
+.team-range[data-team="Panthers"] .team-logo-small.text-fallback { background: #0085CA; color: white; }
+.team-range[data-team="Bears"] .team-logo-small.text-fallback { background: #0B162A; color: white; }
+.team-range[data-team="Bengals"] .team-logo-small.text-fallback { background: #FB4F14; color: white; }
+.team-range[data-team="Browns"] .team-logo-small.text-fallback { background: #311D00; color: white; }
+.team-range[data-team="Cowboys"] .team-logo-small.text-fallback { background: #003594; color: white; }
+.team-range[data-team="Broncos"] .team-logo-small.text-fallback { background: #FB4F14; color: white; }
+.team-range[data-team="Lions"] .team-logo-small.text-fallback { background: #0076B6; color: white; }
+.team-range[data-team="Packers"] .team-logo-small.text-fallback { background: #203731; color: white; }
+.team-range[data-team="Texans"] .team-logo-small.text-fallback { background: #03202F; color: white; }
+.team-range[data-team="Colts"] .team-logo-small.text-fallback { background: #002C5F; color: white; }
+.team-range[data-team="Jaguars"] .team-logo-small.text-fallback { background: #006778; color: white; }
+.team-range[data-team="Chiefs"] .team-logo-small.text-fallback { background: #E31837; color: white; }
+.team-range[data-team="Raiders"] .team-logo-small.text-fallback { background: #000000; color: white; }
+.team-range[data-team="Chargers"] .team-logo-small.text-fallback { background: #0080C6; color: white; }
+.team-range[data-team="Rams"] .team-logo-small.text-fallback { background: #003594; color: white; }
+.team-range[data-team="Dolphins"] .team-logo-small.text-fallback { background: #008E97; color: white; }
+.team-range[data-team="Vikings"] .team-logo-small.text-fallback { background: #4F2683; color: white; }
+.team-range[data-team="Patriots"] .team-logo-small.text-fallback { background: #002244; color: white; }
+.team-range[data-team="Saints"] .team-logo-small.text-fallback { background: #D3BC8D; color: black; }
+.team-range[data-team="Giants"] .team-logo-small.text-fallback { background: #0B2265; color: white; }
+.team-range[data-team="Jets"] .team-logo-small.text-fallback { background: #125740; color: white; }
+.team-range[data-team="Eagles"] .team-logo-small.text-fallback { background: #004C54; color: white; }
+.team-range[data-team="Steelers"] .team-logo-small.text-fallback { background: #FFB612; color: black; }
+.team-range[data-team="49ers"] .team-logo-small.text-fallback { background: #AA0000; color: white; }
+.team-range[data-team="Seahawks"] .team-logo-small.text-fallback { background: #002244; color: white; }
+.team-range[data-team="Buccaneers"] .team-logo-small.text-fallback { background: #D50A0A; color: white; }
+.team-range[data-team="Titans"] .team-logo-small.text-fallback { background: #0C2340; color: white; }
+.team-range[data-team="Commanders"] .team-logo-small.text-fallback { background: #5A1414; color: white; }

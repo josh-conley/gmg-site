@@ -5,41 +5,46 @@ const nflTeams = [
     'Jets', 'Eagles', 'Steelers', '49ers', 'Seahawks', 'Buccaneers', 'Titans', 'Commanders'
 ];
 
-// NFL team abbreviations mapping
-const teamAbbreviations = {
-    'Cardinals': 'ARI',
-    'Falcons': 'ATL',
-    'Ravens': 'BAL',
-    'Bills': 'BUF',
-    'Panthers': 'CAR',
-    'Bears': 'CHI',
-    'Bengals': 'CIN',
-    'Browns': 'CLE',
-    'Cowboys': 'DAL',
-    'Broncos': 'DEN',
-    'Lions': 'DET',
-    'Packers': 'GB',
-    'Texans': 'HOU',
-    'Colts': 'IND',
-    'Jaguars': 'JAX',
-    'Chiefs': 'KC',
-    'Raiders': 'LV',
-    'Chargers': 'LAC',
-    'Rams': 'LAR',
-    'Dolphins': 'MIA',
-    'Vikings': 'MIN',
-    'Patriots': 'NE',
-    'Saints': 'NO',
-    'Giants': 'NYG',
-    'Jets': 'NYJ',
-    'Eagles': 'PHI',
-    'Steelers': 'PIT',
-    '49ers': 'SF',
-    'Seahawks': 'SEA',
-    'Buccaneers': 'TB',
-    'Titans': 'TEN',
-    'Commanders': 'WAS'
+// NFL team data with abbreviations and logo URLs
+const teamData_static = {
+    'Cardinals': { abbr: 'ARI', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/ari.png' },
+    'Falcons': { abbr: 'ATL', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/atl.png' },
+    'Ravens': { abbr: 'BAL', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/bal.png' },
+    'Bills': { abbr: 'BUF', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/buf.png' },
+    'Panthers': { abbr: 'CAR', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/car.png' },
+    'Bears': { abbr: 'CHI', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/chi.png' },
+    'Bengals': { abbr: 'CIN', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/cin.png' },
+    'Browns': { abbr: 'CLE', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/cle.png' },
+    'Cowboys': { abbr: 'DAL', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/dal.png' },
+    'Broncos': { abbr: 'DEN', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/den.png' },
+    'Lions': { abbr: 'DET', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/det.png' },
+    'Packers': { abbr: 'GB', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/gb.png' },
+    'Texans': { abbr: 'HOU', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/hou.png' },
+    'Colts': { abbr: 'IND', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/ind.png' },
+    'Jaguars': { abbr: 'JAX', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/jax.png' },
+    'Chiefs': { abbr: 'KC', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png' },
+    'Raiders': { abbr: 'LV', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/lv.png' },
+    'Chargers': { abbr: 'LAC', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/lac.png' },
+    'Rams': { abbr: 'LAR', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/lar.png' },
+    'Dolphins': { abbr: 'MIA', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/mia.png' },
+    'Vikings': { abbr: 'MIN', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/min.png' },
+    'Patriots': { abbr: 'NE', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/ne.png' },
+    'Saints': { abbr: 'NO', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/no.png' },
+    'Giants': { abbr: 'NYG', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png' },
+    'Jets': { abbr: 'NYJ', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png' },
+    'Eagles': { abbr: 'PHI', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/phi.png' },
+    'Steelers': { abbr: 'PIT', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/pit.png' },
+    '49ers': { abbr: 'SF', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/sf.png' },
+    'Seahawks': { abbr: 'SEA', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/sea.png' },
+    'Buccaneers': { abbr: 'TB', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/tb.png' },
+    'Titans': { abbr: 'TEN', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/ten.png' },
+    'Commanders': { abbr: 'WAS', logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png' }
 };
+
+// Legacy abbreviation mapping for backward compatibility
+const teamAbbreviations = Object.fromEntries(
+    Object.entries(teamData_static).map(([team, data]) => [team, data.abbr])
+);
 
 // Team data: {teamName: {high: 0-100, avg: 0-100, low: 0-100, inChart: boolean}}
 let teamData = {};
@@ -52,9 +57,9 @@ let activeTeam = null; // Track which team is currently highlighted
 function initializeTeamData() {
     nflTeams.forEach(team => {
         teamData[team] = {
-            high: 50,
-            avg: 50,
-            low: 50,
+            high: 8,
+            avg: 16,
+            low: 24,
             inChart: false
         };
     });
@@ -63,13 +68,25 @@ function initializeTeamData() {
 // Create team element for the pool
 function createTeamElement(teamName) {
     const teamDiv = document.createElement('div');
-    teamDiv.className = 'team';
-    teamDiv.draggable = true;
+    teamDiv.className = 'team clickable-team';
     teamDiv.setAttribute('data-team', teamName);
     
     const logoDiv = document.createElement('div');
     logoDiv.className = 'team-logo';
-    logoDiv.textContent = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+    
+    // Create logo image
+    const logoImg = document.createElement('img');
+    logoImg.src = teamData_static[teamName]?.logo || '';
+    logoImg.alt = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+    logoImg.className = 'team-logo-img';
+    
+    // Fallback text if image fails to load
+    logoImg.onerror = function() {
+        logoDiv.innerHTML = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+        logoDiv.classList.add('text-fallback');
+    };
+    
+    logoDiv.appendChild(logoImg);
     
     const nameDiv = document.createElement('div');
     nameDiv.className = 'team-name';
@@ -78,9 +95,10 @@ function createTeamElement(teamName) {
     teamDiv.appendChild(logoDiv);
     teamDiv.appendChild(nameDiv);
     
-    // Add drag event listeners
-    teamDiv.addEventListener('dragstart', handleTeamDragStart);
-    teamDiv.addEventListener('dragend', handleTeamDragEnd);
+    // Add click event listener instead of drag
+    teamDiv.addEventListener('click', function() {
+        addTeamToChart(teamName);
+    });
     
     return teamDiv;
 }
@@ -91,20 +109,7 @@ function createTeamRangeElement(teamName) {
     teamDiv.className = 'team-range';
     teamDiv.setAttribute('data-team', teamName);
     
-    // Team info at bottom
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'team-info';
-    
-    const logoDiv = document.createElement('div');
-    logoDiv.className = 'team-logo-small';
-    logoDiv.textContent = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
-    
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'team-name-small';
-    nameDiv.textContent = teamName;
-    
-    infoDiv.appendChild(logoDiv);
-    infoDiv.appendChild(nameDiv);
+    // No need for team info at bottom since it's now part of the avg slider
     
     // Range bar
     const rangeBar = document.createElement('div');
@@ -115,9 +120,31 @@ function createTeamRangeElement(teamName) {
     highHandle.className = 'range-handle high';
     highHandle.setAttribute('data-type', 'high');
     
+    // Average handle is now the team logo and name
     const avgHandle = document.createElement('div');
-    avgHandle.className = 'range-handle avg';
+    avgHandle.className = 'range-handle avg team-avg-slider';
     avgHandle.setAttribute('data-type', 'avg');
+    
+    // Create logo for average handle
+    const avgLogoImg = document.createElement('img');
+    avgLogoImg.src = teamData_static[teamName]?.logo || '';
+    avgLogoImg.alt = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+    avgLogoImg.className = 'avg-logo-img';
+    
+    // Create name for average handle
+    const avgTeamName = document.createElement('div');
+    avgTeamName.className = 'avg-team-name';
+    avgTeamName.textContent = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+    
+    // Fallback if logo fails
+    avgLogoImg.onerror = function() {
+        avgHandle.innerHTML = '';
+        avgHandle.appendChild(avgTeamName);
+        avgHandle.classList.add('text-only-avg');
+    };
+    
+    avgHandle.appendChild(avgLogoImg);
+    avgHandle.appendChild(avgTeamName);
     
     const lowHandle = document.createElement('div');
     lowHandle.className = 'range-handle low';
@@ -127,57 +154,22 @@ function createTeamRangeElement(teamName) {
     teamDiv.appendChild(highHandle);
     teamDiv.appendChild(avgHandle);
     teamDiv.appendChild(lowHandle);
-    teamDiv.appendChild(infoDiv);
     
     // Add mouse event listeners for handles
     [highHandle, avgHandle, lowHandle].forEach(handle => {
         handle.addEventListener('mousedown', startHandleDrag);
     });
     
-    // Add double-click to remove from chart
-    teamDiv.addEventListener('dblclick', function() {
+    // Add double-click to remove from chart (on the range bar, not the avg handle)
+    rangeBar.addEventListener('dblclick', function() {
         removeTeamFromChart(teamName);
     });
     
-    updateTeamRangePosition(teamName);
+    // Don't call updateTeamRangePosition here - it will be called after data is set
     return teamDiv;
 }
 
-// Team drag and drop functions
-function handleTeamDragStart(e) {
-    draggedTeam = this.getAttribute('data-team');
-    this.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function handleTeamDragEnd(e) {
-    this.classList.remove('dragging');
-    draggedTeam = null;
-}
-
-// Chart area drag and drop
-function setupChartDropZone() {
-    const chartArea = document.getElementById('chart-area');
-    const chartContainer = document.querySelector('.chart-container');
-    
-    chartArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        chartContainer.classList.add('drag-over');
-    });
-    
-    chartArea.addEventListener('dragleave', function(e) {
-        chartContainer.classList.remove('drag-over');
-    });
-    
-    chartArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        chartContainer.classList.remove('drag-over');
-        if (draggedTeam && !teamData[draggedTeam].inChart) {
-            addTeamToChart(draggedTeam);
-        }
-    });
-}
+// No longer need drag and drop functions since teams are click-to-add
 
 // Set active team and update visual highlighting
 function setActiveTeam(teamName) {
@@ -200,7 +192,12 @@ function setActiveTeam(teamName) {
 function addTeamToChart(teamName) {
     if (teamData[teamName].inChart) return;
     
+    // FIRST: Set default ranking values when adding to chart
+    teamData[teamName].high = 8;
+    teamData[teamName].avg = 16;
+    teamData[teamName].low = 24;
     teamData[teamName].inChart = true;
+    
     
     // Remove from pool
     const poolTeam = document.querySelector(`.teams-container .team[data-team="${teamName}"]`);
@@ -208,10 +205,13 @@ function addTeamToChart(teamName) {
         poolTeam.remove();
     }
     
-    // Add to chart
+    // THEN: Add to chart (createTeamRangeElement will use the correct values)
     const chartContainer = document.getElementById('teams-ranges');
     const teamRangeElement = createTeamRangeElement(teamName);
     chartContainer.appendChild(teamRangeElement);
+    
+    // NOW update position with the correct data values
+    updateTeamRangePosition(teamName);
     
     // Set as active team when first added
     setActiveTeam(teamName);
@@ -246,10 +246,12 @@ function startHandleDrag(e) {
     e.stopPropagation();
     
     isDraggingHandle = true;
+    // Find the actual handle element (in case we clicked on a child like img or text)
+    const handleElement = e.target.closest('.range-handle');
     currentHandle = {
-        element: e.target,
-        teamName: e.target.closest('.team-range').getAttribute('data-team'),
-        type: e.target.getAttribute('data-type')
+        element: handleElement,
+        teamName: handleElement.closest('.team-range').getAttribute('data-team'),
+        type: handleElement.getAttribute('data-type')
     };
     
     // Set this team as active when any handle is clicked
@@ -258,7 +260,7 @@ function startHandleDrag(e) {
     document.addEventListener('mousemove', handleHandleDrag);
     document.addEventListener('mouseup', endHandleDrag);
     
-    e.target.style.cursor = 'grabbing';
+    handleElement.style.cursor = 'grabbing';
 }
 
 function handleHandleDrag(e) {
@@ -266,30 +268,48 @@ function handleHandleDrag(e) {
     
     const chartArea = document.querySelector('.chart-area');
     const rect = chartArea.getBoundingClientRect();
-    const chartHeight = rect.height - 60; // Account for team info space
+    const chartHeight = rect.height; // No need to account for bottom space anymore
     
-    // Calculate position (0-100, inverted because chart goes top to bottom)
+    // Calculate position (1-32 rankings, 1=top, 32=bottom)
     const relativeY = e.clientY - rect.top;
-    const percentage = Math.max(0, Math.min(100, 100 - (relativeY / chartHeight * 100)));
+    const percentage = Math.max(0, Math.min(1, relativeY / chartHeight));
+    let ranking = Math.round(percentage * 31 + 1); // Convert to 1-32 range
+    
+    // Ensure ranking stays within 1-32 bounds
+    ranking = Math.max(1, Math.min(32, ranking));
     
     const teamName = currentHandle.teamName;
     const handleType = currentHandle.type;
     
-    // Update team data
-    teamData[teamName][handleType] = Math.round(percentage);
+    // Debug logging
+    console.log(`BEFORE: ${handleType} = ${teamData[teamName][handleType]}, NEW = ${ranking}`);
     
-    // Enforce logical constraints
+    // Update team data
+    teamData[teamName][handleType] = ranking;
+    
+    // Enforce logical constraints (high=best rank=low number, low=worst rank=high number)
     const data = teamData[teamName];
     if (handleType === 'high') {
-        data.avg = Math.min(data.avg, data.high);
-        data.low = Math.min(data.low, data.avg);
+        // When dragging high handle, ensure avg >= high and low >= avg
+        data.avg = Math.max(data.avg, data.high);
+        data.low = Math.max(data.low, data.avg);
     } else if (handleType === 'avg') {
-        data.high = Math.max(data.high, data.avg);
-        data.low = Math.min(data.low, data.avg);
+        // When dragging avg handle, ensure high <= avg and low >= avg  
+        data.high = Math.min(data.high, data.avg);
+        data.low = Math.max(data.low, data.avg);
     } else if (handleType === 'low') {
-        data.avg = Math.max(data.avg, data.low);
-        data.high = Math.max(data.high, data.avg);
+        // When dragging low handle, ensure avg <= low and high <= avg
+        data.avg = Math.min(data.avg, data.low);
+        data.high = Math.min(data.high, data.avg);
     }
+    
+    // Ensure all values stay within 1-32 bounds after constraints
+    data.high = Math.max(1, Math.min(32, data.high));
+    data.avg = Math.max(1, Math.min(32, data.avg));
+    data.low = Math.max(1, Math.min(32, data.low));
+    
+    // Debug logging
+    console.log(`AFTER CONSTRAINTS: High=${data.high}, Avg=${data.avg}, Low=${data.low}`);
     
     updateTeamRangePosition(teamName);
     // Only sort if NOT dragging the average handle
@@ -299,7 +319,7 @@ function handleHandleDrag(e) {
     saveData();
 }
 
-function endHandleDrag(e) {
+function endHandleDrag() {
     isDraggingHandle = false;
     
     // If we were dragging the average handle, sort now
@@ -322,12 +342,16 @@ function updateTeamRangePosition(teamName) {
     if (!teamElement) return;
     
     const data = teamData[teamName];
-    const chartHeight = document.querySelector('.chart-area').offsetHeight - 60;
+    const chartHeight = document.querySelector('.chart-area').offsetHeight;
     
-    // Calculate positions (inverted: 100% = top, 0% = bottom)
-    const highPos = (100 - data.high) * chartHeight / 100;
-    const avgPos = (100 - data.avg) * chartHeight / 100;
-    const lowPos = (100 - data.low) * chartHeight / 100;
+    
+    // Calculate positions (rank 1 = top, rank 32 = bottom)
+    const highPos = (data.high - 1) / 31 * chartHeight;
+    const avgPos = (data.avg - 1) / 31 * chartHeight;
+    const lowPos = (data.low - 1) / 31 * chartHeight;
+    
+    // Debug logging
+    console.log(`POSITION UPDATE: ${teamName} - H:${data.high}(${highPos}px) A:${data.avg}(${avgPos}px) L:${data.low}(${lowPos}px) ChartHeight:${chartHeight}`);
     
     // Update range bar
     const rangeBar = teamElement.querySelector('.range-bar');
@@ -345,11 +369,11 @@ function sortTeamsByAverage() {
     const container = document.getElementById('teams-ranges');
     const teamElements = Array.from(container.children);
     
-    // Sort by average (descending)
+    // Sort by average ranking (ascending - best ranks first)
     teamElements.sort((a, b) => {
         const teamA = a.getAttribute('data-team');
         const teamB = b.getAttribute('data-team');
-        return teamData[teamB].avg - teamData[teamA].avg;
+        return teamData[teamA].avg - teamData[teamB].avg;
     });
     
     // Re-append in sorted order and maintain active state
@@ -434,7 +458,6 @@ function handleResize() {
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
-    setupChartDropZone();
     
     // Event listeners
     document.getElementById('reset-btn').addEventListener('click', resetRankings);
