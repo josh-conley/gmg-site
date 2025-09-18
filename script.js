@@ -52,6 +52,7 @@ let draggedTeam = null;
 let isDraggingHandle = false;
 let currentHandle = null;
 let activeTeam = null; // Track which team is currently highlighted
+let currentSortMode = 'avg'; // Track current sorting mode (avg, high, low)
 
 // Gradient calculation functions for range bars
 function getRankColorFromNormalized(normalized) {
@@ -82,7 +83,6 @@ function getRankGradient(highRank, lowRank) {
     const highColor = getRankColorFromNormalized(highNormalized);
     stops.push(`${highColor} 0%`);
     
-    console.log(`GRADIENT DEBUG: High rank ${highRank} -> normalized ${highNormalized} -> color ${highColor}`);
     
     // If there's enough range, add intermediate stops
     const rangeSpan = lowRank - highRank;
@@ -92,7 +92,6 @@ function getRankGradient(highRank, lowRank) {
         const midNormalized = (midRank - 1) / totalRange;
         const midColor = getRankColorFromNormalized(midNormalized);
         stops.push(`${midColor} 50%`);
-        console.log(`GRADIENT DEBUG: Mid rank ${midRank} -> normalized ${midNormalized} -> color ${midColor}`);
     }
     
     // Calculate color for low rank (bottom of range bar)
@@ -100,10 +99,7 @@ function getRankGradient(highRank, lowRank) {
     const lowColor = getRankColorFromNormalized(lowNormalized);
     stops.push(`${lowColor} 100%`);
     
-    console.log(`GRADIENT DEBUG: Low rank ${lowRank} -> normalized ${lowNormalized} -> color ${lowColor}`);
-    
     const gradient = `linear-gradient(to bottom, ${stops.join(', ')})`;
-    console.log(`GRADIENT DEBUG: Final gradient: ${gradient}`);
     
     return gradient;
 }
@@ -265,7 +261,7 @@ function addTeamToChart(teamName) {
     // Set as active team when first added
     setActiveTeam(teamName);
     
-    sortTeamsByAverage();
+    sortTeamsByRanking(currentSortMode);
     saveData();
 }
 
@@ -332,7 +328,6 @@ function handleHandleDrag(e) {
     const teamName = currentHandle.teamName;
     const handleType = currentHandle.type;
     
-    console.log(`Mouse: ${relativeY}px, Height: ${rect.height}px, Percent: ${clampedPercentage}, Rank: ${ranking}`);
     
     // Update team data
     teamData[teamName][handleType] = ranking;
@@ -355,11 +350,10 @@ function handleHandleDrag(e) {
     data.avg = Math.max(1, Math.min(32, data.avg));
     data.low = Math.max(1, Math.min(32, data.low));
     
-    console.log(`Final: High=${data.high}, Avg=${data.avg}, Low=${data.low}`);
-    
     updateTeamRangePosition(teamName);
+    // Always sort when dragging non-avg handles, but delay sorting for avg handle until drag ends
     if (handleType !== 'avg') {
-        sortTeamsByAverage();
+        sortTeamsByRanking(currentSortMode);
     }
     saveData();
 }
@@ -369,7 +363,7 @@ function endHandleDrag() {
     
     // If we were dragging the average handle, sort now
     if (currentHandle && currentHandle.type === 'avg') {
-        sortTeamsByAverage();
+        sortTeamsByRanking(currentSortMode);
     }
     
     if (currentHandle) {
@@ -396,7 +390,6 @@ function updateTeamRangePosition(teamName) {
     const avgPos = ((data.avg - 1) / 31) * containerHeight;
     const lowPos = ((data.low - 1) / 31) * containerHeight;
     
-    console.log(`VISUAL: ${teamName} - Rank ${data.high} -> ${highPos}px, Rank ${data.avg} -> ${avgPos}px, Rank ${data.low} -> ${lowPos}px (Container: ${containerHeight}px)`);
     
     // Update range bar
     const rangeBar = teamElement.querySelector('.range-bar');
@@ -406,8 +399,6 @@ function updateTeamRangePosition(teamName) {
     // Apply the calculated gradient
     const gradient = getRankGradient(data.high, data.low);
     rangeBar.style.setProperty('background-image', gradient, 'important');
-    
-    console.log(`GRADIENT: ${teamName} ranks ${data.high}-${data.low} -> ${gradient}`);
     
     
     // Update handles (center them on the calculated position)
@@ -430,7 +421,6 @@ function updateTeamRangePosition(teamName) {
     const slider = avgHandle.querySelector('.team-avg-slider');
     
     if (avgTeamName && avgLogo && slider) {
-        console.log(`DEBUG: Updating ${teamName} to rank ${data.avg}`);
         
         // Set the rank number
         avgTeamName.textContent = data.avg;
@@ -452,25 +442,20 @@ function updateTeamRangePosition(teamName) {
         }
         
         const color = getRankColor(data.avg);
-        console.log(`DEBUG: Setting color to ${color} for rank ${data.avg}`);
         avgTeamName.style.color = color;
         
         // Reorder elements based on ranking (without clearing innerHTML)
         if (data.avg >= 17) {
             // Rank 17-32: rank on top, logo below
-            console.log(`DEBUG: Rank ${data.avg} >= 17, putting rank on top`);
             if (slider.firstChild !== avgTeamName) {
                 slider.insertBefore(avgTeamName, slider.firstChild);
             }
         } else {
             // Rank 1-16: logo on top, rank below
-            console.log(`DEBUG: Rank ${data.avg} < 17, putting logo on top`);
             if (slider.firstChild !== avgLogo) {
                 slider.insertBefore(avgLogo, slider.firstChild);
             }
         }
-    } else {
-        console.log(`DEBUG: Missing elements for ${teamName}:`, {avgTeamName, avgLogo, slider});
     }
     
     lowHandle.style.top = `${lowPos - handleHeight/2}px`;
@@ -803,11 +788,10 @@ function parseAndApplyCSV(csvContent) {
     });
     
     // Sort and refresh display
-    sortTeamsByAverage();
+    sortTeamsByRanking(currentSortMode);
     populateRandomTeams();
     saveData();
     
-    alert(`Imported ${importedTeams.length} teams successfully!`);
 }
 
 // Save/Load data
@@ -839,19 +823,9 @@ function handleResize() {
     });
 }
 
-// Test gradient calculation function
-function testGradient() {
-    console.log("=== GRADIENT TESTS ===");
-    console.log("Default team (8-24):", getRankGradient(8, 24));
-    console.log("Top team (1-5):", getRankGradient(1, 5));
-    console.log("Bottom team (28-32):", getRankGradient(28, 32));
-    console.log("Mid team (15-18):", getRankGradient(15, 18));
-    console.log("=== END TESTS ===");
-}
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
-    testGradient();
     loadData();
     
     // Event listeners
@@ -860,9 +834,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('export-btn').addEventListener('click', exportData);
     document.getElementById('import-btn').addEventListener('click', importData);
     document.getElementById('import-file').addEventListener('change', handleFileImport);
-    document.getElementById('sort-high-btn').addEventListener('click', () => sortTeamsByRanking('high'));
-    document.getElementById('sort-avg-btn').addEventListener('click', () => sortTeamsByRanking('avg'));
-    document.getElementById('sort-low-btn').addEventListener('click', () => sortTeamsByRanking('low'));
+    document.getElementById('sort-high-btn').addEventListener('click', () => {
+        currentSortMode = 'high';
+        sortTeamsByRanking('high');
+    });
+    document.getElementById('sort-avg-btn').addEventListener('click', () => {
+        currentSortMode = 'avg';
+        sortTeamsByRanking('avg');
+    });
+    document.getElementById('sort-low-btn').addEventListener('click', () => {
+        currentSortMode = 'low';
+        sortTeamsByRanking('low');
+    });
     window.addEventListener('resize', handleResize);
     
     // Click elsewhere to clear selection
