@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL Range Ranking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NFL Team Range Ranking</h1>
+            <div class="controls">
+                <button id="reset-btn">Reset Rankings</button>
+                <button id="view-toggle">Switch to Tier View</button>
+            </div>
+        </header>
+        
+        <div class="chart-container">
+            <div class="y-axis">
+                <div class="y-label" style="top: 0%">100</div>
+                <div class="y-label" style="top: 20%">80</div>
+                <div class="y-label" style="top: 40%">60</div>
+                <div class="y-label" style="top: 60%">40</div>
+                <div class="y-label" style="top: 80%">20</div>
+                <div class="y-label" style="top: 100%">0</div>
+            </div>
+            
+            <div class="chart-area" id="chart-area">
+                <div class="grid-lines">
+                    <div class="grid-line" style="top: 0%"></div>
+                    <div class="grid-line" style="top: 20%"></div>
+                    <div class="grid-line" style="top: 40%"></div>
+                    <div class="grid-line" style="top: 60%"></div>
+                    <div class="grid-line" style="top: 80%"></div>
+                    <div class="grid-line" style="top: 100%"></div>
+                </div>
+                
+                <div class="teams-ranges" id="teams-ranges"></div>
+            </div>
+        </div>
+        
+        <div class="teams-pool">
+            <h3>NFL Teams - Drag to Chart</h3>
+            <div class="teams-container" id="teams-container"></div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon high"></div>
+                <span>High Estimate</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon avg"></div>
+                <span>Average</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon low"></div>
+                <span>Low Estimate</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
