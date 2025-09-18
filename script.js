@@ -794,8 +794,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Click elsewhere to clear selection
     document.addEventListener('click', function(e) {
-        // Check if click was outside of any team range or handle
-        if (!e.target.closest('.team-range') && !e.target.closest('.range-handle')) {
+        // Check if click was outside of any team range, handle, or team item
+        if (!e.target.closest('.team-range') && !e.target.closest('.range-handle') && !e.target.closest('.team-item')) {
             setActiveTeam(null);
         }
     });
