@@ -68,37 +68,26 @@ function initializeTeamData() {
 // Create team element for the pool
 function createTeamElement(teamName) {
     const teamDiv = document.createElement('div');
-    teamDiv.className = 'team clickable-team';
+    teamDiv.className = 'team-item';
     teamDiv.setAttribute('data-team', teamName);
-    
-    const logoDiv = document.createElement('div');
-    logoDiv.className = 'team-logo';
     
     // Create logo image
     const logoImg = document.createElement('img');
     logoImg.src = teamData_static[teamName]?.logo || '';
-    logoImg.alt = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
-    logoImg.className = 'team-logo-img';
+    logoImg.alt = teamName;
+    logoImg.className = 'team-logo';
     
     // Fallback text if image fails to load
     logoImg.onerror = function() {
-        logoDiv.innerHTML = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
-        logoDiv.classList.add('text-fallback');
+        logoImg.style.display = 'none';
+        const teamNameSpan = document.createElement('span');
+        teamNameSpan.textContent = teamName;
+        teamNameSpan.style.fontSize = '14px';
+        teamNameSpan.style.marginTop = '20px';
+        teamDiv.appendChild(teamNameSpan);
     };
     
-    logoDiv.appendChild(logoImg);
-    
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'team-name';
-    nameDiv.textContent = teamName;
-    
-    teamDiv.appendChild(logoDiv);
-    teamDiv.appendChild(nameDiv);
-    
-    // Add click event listener instead of drag
-    teamDiv.addEventListener('click', function() {
-        addTeamToChart(teamName);
-    });
+    teamDiv.appendChild(logoImg);
     
     return teamDiv;
 }
@@ -122,8 +111,12 @@ function createTeamRangeElement(teamName) {
     
     // Average handle is now the team logo and name
     const avgHandle = document.createElement('div');
-    avgHandle.className = 'range-handle avg team-avg-slider';
+    avgHandle.className = 'range-handle avg';
     avgHandle.setAttribute('data-type', 'avg');
+    
+    // Create container for logo and text
+    const avgSlider = document.createElement('div');
+    avgSlider.className = 'team-avg-slider';
     
     // Create logo for average handle
     const avgLogoImg = document.createElement('img');
@@ -134,17 +127,18 @@ function createTeamRangeElement(teamName) {
     // Create name for average handle
     const avgTeamName = document.createElement('div');
     avgTeamName.className = 'avg-team-name';
-    avgTeamName.textContent = teamAbbreviations[teamName] || teamName.substring(0, 3).toUpperCase();
+    avgTeamName.textContent = '16'; // Default rank, will be updated by updateTeamRangePosition
     
     // Fallback if logo fails
     avgLogoImg.onerror = function() {
-        avgHandle.innerHTML = '';
-        avgHandle.appendChild(avgTeamName);
+        avgSlider.innerHTML = '';
+        avgSlider.appendChild(avgTeamName);
         avgHandle.classList.add('text-only-avg');
     };
     
-    avgHandle.appendChild(avgLogoImg);
-    avgHandle.appendChild(avgTeamName);
+    avgSlider.appendChild(avgLogoImg);
+    avgSlider.appendChild(avgTeamName);
+    avgHandle.appendChild(avgSlider);
     
     const lowHandle = document.createElement('div');
     lowHandle.className = 'range-handle low';
@@ -266,53 +260,49 @@ function startHandleDrag(e) {
 function handleHandleDrag(e) {
     if (!isDraggingHandle || !currentHandle) return;
     
-    const chartArea = document.querySelector('.chart-area');
-    const rect = chartArea.getBoundingClientRect();
-    const chartHeight = rect.height; // No need to account for bottom space anymore
+    // Use teams-ranges container for BOTH mouse calculation AND visual positioning
+    const teamsRanges = document.querySelector('.teams-ranges');
+    const rect = teamsRanges.getBoundingClientRect();
     
-    // Calculate position (1-32 rankings, 1=top, 32=bottom)
+    // Calculate mouse position within the container (no padding adjustments)
     const relativeY = e.clientY - rect.top;
-    const percentage = Math.max(0, Math.min(1, relativeY / chartHeight));
-    let ranking = Math.round(percentage * 31 + 1); // Convert to 1-32 range
+    const percentage = relativeY / rect.height;
     
-    // Ensure ranking stays within 1-32 bounds
-    ranking = Math.max(1, Math.min(32, ranking));
+    // Clamp percentage to 0-1 range
+    const clampedPercentage = Math.max(0, Math.min(1, percentage));
+    
+    // Convert directly to 1-32 ranking
+    let ranking = Math.round(clampedPercentage * 31) + 1;
     
     const teamName = currentHandle.teamName;
     const handleType = currentHandle.type;
     
-    // Debug logging
-    console.log(`BEFORE: ${handleType} = ${teamData[teamName][handleType]}, NEW = ${ranking}`);
+    console.log(`Mouse: ${relativeY}px, Height: ${rect.height}px, Percent: ${clampedPercentage}, Rank: ${ranking}`);
     
     // Update team data
     teamData[teamName][handleType] = ranking;
     
-    // Enforce logical constraints (high=best rank=low number, low=worst rank=high number)
+    // Enforce logical constraints
     const data = teamData[teamName];
     if (handleType === 'high') {
-        // When dragging high handle, ensure avg >= high and low >= avg
         data.avg = Math.max(data.avg, data.high);
         data.low = Math.max(data.low, data.avg);
     } else if (handleType === 'avg') {
-        // When dragging avg handle, ensure high <= avg and low >= avg  
         data.high = Math.min(data.high, data.avg);
         data.low = Math.max(data.low, data.avg);
     } else if (handleType === 'low') {
-        // When dragging low handle, ensure avg <= low and high <= avg
         data.avg = Math.min(data.avg, data.low);
         data.high = Math.min(data.high, data.avg);
     }
     
-    // Ensure all values stay within 1-32 bounds after constraints
+    // Ensure bounds
     data.high = Math.max(1, Math.min(32, data.high));
     data.avg = Math.max(1, Math.min(32, data.avg));
     data.low = Math.max(1, Math.min(32, data.low));
     
-    // Debug logging
-    console.log(`AFTER CONSTRAINTS: High=${data.high}, Avg=${data.avg}, Low=${data.low}`);
+    console.log(`Final: High=${data.high}, Avg=${data.avg}, Low=${data.low}`);
     
     updateTeamRangePosition(teamName);
-    // Only sort if NOT dragging the average handle
     if (handleType !== 'avg') {
         sortTeamsByAverage();
     }
@@ -342,26 +332,86 @@ function updateTeamRangePosition(teamName) {
     if (!teamElement) return;
     
     const data = teamData[teamName];
-    const chartHeight = document.querySelector('.chart-area').offsetHeight;
+    const teamsRanges = document.querySelector('.teams-ranges');
+    const containerHeight = teamsRanges.offsetHeight;
     
+    // Convert ranking to pixel position within the teams-ranges container
+    // Rank 1 = 0px, Rank 32 = full container height
+    const highPos = ((data.high - 1) / 31) * containerHeight;
+    const avgPos = ((data.avg - 1) / 31) * containerHeight;
+    const lowPos = ((data.low - 1) / 31) * containerHeight;
     
-    // Calculate positions (rank 1 = top, rank 32 = bottom)
-    const highPos = (data.high - 1) / 31 * chartHeight;
-    const avgPos = (data.avg - 1) / 31 * chartHeight;
-    const lowPos = (data.low - 1) / 31 * chartHeight;
-    
-    // Debug logging
-    console.log(`POSITION UPDATE: ${teamName} - H:${data.high}(${highPos}px) A:${data.avg}(${avgPos}px) L:${data.low}(${lowPos}px) ChartHeight:${chartHeight}`);
+    console.log(`VISUAL: ${teamName} - Rank ${data.high} -> ${highPos}px, Rank ${data.avg} -> ${avgPos}px, Rank ${data.low} -> ${lowPos}px (Container: ${containerHeight}px)`);
     
     // Update range bar
     const rangeBar = teamElement.querySelector('.range-bar');
     rangeBar.style.top = `${highPos}px`;
     rangeBar.style.height = `${Math.max(2, lowPos - highPos)}px`;
     
-    // Update handles
-    teamElement.querySelector('.range-handle.high').style.top = `${highPos}px`;
-    teamElement.querySelector('.range-handle.avg').style.top = `${avgPos}px`;
-    teamElement.querySelector('.range-handle.low').style.top = `${lowPos}px`;
+    // Update handles (center them on the calculated position)
+    const handleHeight = 16; // Standard handle height
+    const avgHandleHeight = 32; // Avg handle is taller
+    
+    const highHandle = teamElement.querySelector('.range-handle.high');
+    const avgHandle = teamElement.querySelector('.range-handle.avg');
+    const lowHandle = teamElement.querySelector('.range-handle.low');
+    
+    highHandle.style.top = `${highPos - handleHeight/2}px`;
+    highHandle.setAttribute('data-rank', data.high);
+    
+    avgHandle.style.top = `${avgPos - avgHandleHeight/2}px`;
+    
+    // Update avg handle text and reorder elements based on ranking
+    const avgTeamName = avgHandle.querySelector('.avg-team-name');
+    const avgLogo = avgHandle.querySelector('.avg-logo-img');
+    const slider = avgHandle.querySelector('.team-avg-slider');
+    
+    if (avgTeamName && avgLogo && slider) {
+        console.log(`DEBUG: Updating ${teamName} to rank ${data.avg}`);
+        
+        // Set the rank number
+        avgTeamName.textContent = data.avg;
+        
+        // Color code based on ranking with green-yellow-red gradient
+        function getRankColor(rank) {
+            const normalized = (rank - 1) / 31;
+            let red, green, blue = 0;
+            
+            if (normalized <= 0.5) {
+                red = Math.round(255 * (normalized * 2));
+                green = 255;
+            } else {
+                red = 255;
+                green = Math.round(255 * (1 - (normalized - 0.5) * 2));
+            }
+            
+            return `rgb(${red}, ${green}, ${blue})`;
+        }
+        
+        const color = getRankColor(data.avg);
+        console.log(`DEBUG: Setting color to ${color} for rank ${data.avg}`);
+        avgTeamName.style.color = color;
+        
+        // Reorder elements based on ranking (without clearing innerHTML)
+        if (data.avg >= 17) {
+            // Rank 17-32: rank on top, logo below
+            console.log(`DEBUG: Rank ${data.avg} >= 17, putting rank on top`);
+            if (slider.firstChild !== avgTeamName) {
+                slider.insertBefore(avgTeamName, slider.firstChild);
+            }
+        } else {
+            // Rank 1-16: logo on top, rank below
+            console.log(`DEBUG: Rank ${data.avg} < 17, putting logo on top`);
+            if (slider.firstChild !== avgLogo) {
+                slider.insertBefore(avgLogo, slider.firstChild);
+            }
+        }
+    } else {
+        console.log(`DEBUG: Missing elements for ${teamName}:`, {avgTeamName, avgLogo, slider});
+    }
+    
+    lowHandle.style.top = `${lowPos - handleHeight/2}px`;
+    lowHandle.setAttribute('data-rank', data.low);
 }
 
 // Sort teams by average ranking (highest to lowest, left to right)
@@ -387,17 +437,74 @@ function sortTeamsByAverage() {
     });
 }
 
-// Populate teams pool
-function populateTeamsPool() {
-    const container = document.getElementById('teams-container');
-    container.innerHTML = '';
+// Sort teams by ranking value
+function sortTeamsByRanking(rankingType = 'avg') {
+    const container = document.getElementById('teams-ranges');
+    const teamElements = Array.from(container.children);
     
-    nflTeams.forEach(team => {
-        if (!teamData[team].inChart) {
-            const teamElement = createTeamElement(team);
-            container.appendChild(teamElement);
+    // Sort by the specified ranking (ascending - best ranks first)
+    teamElements.sort((a, b) => {
+        const teamA = a.getAttribute('data-team');
+        const teamB = b.getAttribute('data-team');
+        return teamData[teamA][rankingType] - teamData[teamB][rankingType];
+    });
+    
+    // Re-append in sorted order and maintain active state
+    teamElements.forEach(element => {
+        container.appendChild(element);
+        // Restore active class if this was the active team
+        const teamName = element.getAttribute('data-team');
+        if (teamName === activeTeam) {
+            element.classList.add('active');
         }
     });
+}
+
+// Store the randomized team queue
+let teamQueue = [];
+
+// Initialize team queue with randomized order
+function initializeTeamQueue() {
+    const availableTeams = nflTeams.filter(teamName => !teamData[teamName].inChart);
+    teamQueue = [...availableTeams].sort(() => Math.random() - 0.5);
+}
+
+// Populate up next teams (up to 3)
+function populateRandomTeams() {
+    const container = document.getElementById('random-teams-container');
+    const remainingCounter = document.getElementById('teams-remaining');
+    container.innerHTML = '';
+    
+    // Filter out teams that are already in the chart from the queue
+    teamQueue = teamQueue.filter(teamName => !teamData[teamName].inChart);
+    
+    // If queue is empty or needs refresh, initialize it
+    if (teamQueue.length === 0) {
+        initializeTeamQueue();
+    }
+    
+    // Update remaining count
+    const totalRemaining = nflTeams.filter(teamName => !teamData[teamName].inChart).length;
+    remainingCounter.textContent = `${totalRemaining} remaining`;
+    
+    // Show up to 3 teams from the queue that are not in chart
+    const availableTeams = teamQueue.filter(teamName => !teamData[teamName].inChart);
+    const teamsToShow = Math.min(3, availableTeams.length);
+    
+    for (let i = 0; i < teamsToShow; i++) {
+        if (availableTeams[i]) {
+            const teamName = availableTeams[i];
+            const teamElement = createTeamElement(teamName);
+            teamElement.onclick = () => {
+                addTeamToChart(teamName);
+                // Remove the clicked team from queue
+                teamQueue = teamQueue.filter(t => t !== teamName);
+                // Refresh display with next team moving into position
+                populateRandomTeams();
+            };
+            container.appendChild(teamElement);
+        }
+    }
 }
 
 // Reset all rankings
@@ -409,10 +516,167 @@ function resetRankings() {
     initializeTeamData();
     activeTeam = null;
     
-    // Repopulate pool
-    populateTeamsPool();
+    // Reset the team queue and repopulate
+    teamQueue = [];
+    populateRandomTeams();
     
     saveData();
+}
+
+// Add all teams to chart
+function addAllTeams() {
+    nflTeams.forEach(teamName => {
+        if (!teamData[teamName].inChart) {
+            addTeamToChart(teamName);
+        }
+    });
+    // Refresh up next display after adding all teams
+    populateRandomTeams();
+}
+
+// Export data functionality
+function exportData() {
+    // Get the current page title
+    const pageTitle = document.getElementById('page-title').textContent;
+    
+    // Get teams that are currently in the chart
+    const teamsInChart = nflTeams.filter(teamName => teamData[teamName].inChart);
+    
+    if (teamsInChart.length === 0) {
+        alert('No teams in chart to export!');
+        return;
+    }
+    
+    // Create CSV content
+    let csvContent = `"${pageTitle}"\n\n`;
+    csvContent += 'Team,High,Avg,Low\n';
+    
+    // Sort teams by average ranking for export
+    teamsInChart.sort((a, b) => teamData[a].avg - teamData[b].avg);
+    
+    teamsInChart.forEach(teamName => {
+        const data = teamData[teamName];
+        const abbr = teamData_static[teamName]?.abbr || teamName;
+        csvContent += `${abbr},${data.high},${data.avg},${data.low}\n`;
+    });
+    
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nfl-rankings-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// Import data functionality
+function importData() {
+    const fileInput = document.getElementById('import-file');
+    fileInput.click();
+}
+
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csvContent = e.target.result;
+        parseAndApplyCSV(csvContent);
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    event.target.value = '';
+}
+
+function parseAndApplyCSV(csvContent) {
+    const lines = csvContent.trim().split('\n');
+    
+    if (lines.length < 3) {
+        alert('Invalid CSV format');
+        return;
+    }
+    
+    // Extract page title (first line, remove quotes)
+    const pageTitle = lines[0].replace(/^"|"$/g, '');
+    
+    // Find the header line (should be "Team,High,Avg,Low")
+    let dataStartIndex = -1;
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === 'Team,High,Avg,Low') {
+            dataStartIndex = i + 1;
+            break;
+        }
+    }
+    
+    if (dataStartIndex === -1) {
+        alert('Could not find data header in CSV');
+        return;
+    }
+    
+    // Reset current data
+    resetRankings();
+    
+    // Apply page title
+    document.getElementById('page-title').textContent = pageTitle;
+    
+    // Parse team data
+    const importedTeams = [];
+    for (let i = dataStartIndex; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const parts = line.split(',');
+        if (parts.length !== 4) continue;
+        
+        const [abbr, high, avg, low] = parts;
+        
+        // Find team name by abbreviation
+        const teamName = Object.keys(teamData_static).find(name => 
+            teamData_static[name].abbr === abbr
+        );
+        
+        if (teamName) {
+            const highVal = parseInt(high);
+            const avgVal = parseInt(avg);
+            const lowVal = parseInt(low);
+            
+            if (!isNaN(highVal) && !isNaN(avgVal) && !isNaN(lowVal)) {
+                importedTeams.push({
+                    name: teamName,
+                    high: Math.max(1, Math.min(32, highVal)),
+                    avg: Math.max(1, Math.min(32, avgVal)),
+                    low: Math.max(1, Math.min(32, lowVal))
+                });
+            }
+        }
+    }
+    
+    // Apply imported team data
+    importedTeams.forEach(team => {
+        teamData[team.name] = {
+            high: team.high,
+            avg: team.avg,
+            low: team.low,
+            inChart: true
+        };
+        
+        const chartContainer = document.getElementById('teams-ranges');
+        const teamRangeElement = createTeamRangeElement(team.name);
+        chartContainer.appendChild(teamRangeElement);
+        updateTeamRangePosition(team.name);
+    });
+    
+    // Sort and refresh display
+    sortTeamsByAverage();
+    populateRandomTeams();
+    saveData();
+    
+    alert(`Imported ${importedTeams.length} teams successfully!`);
 }
 
 // Save/Load data
@@ -421,29 +685,18 @@ function saveData() {
 }
 
 function loadData() {
-    const saved = localStorage.getItem('nflRangeData');
-    if (saved) {
-        teamData = JSON.parse(saved);
-    } else {
-        initializeTeamData();
-    }
+    // Always start fresh - don't load saved data
+    initializeTeamData();
     
     // Reset active team on load
     activeTeam = null;
     
-    // Populate chart with teams that are in chart
+    // Clear chart completely
     const chartContainer = document.getElementById('teams-ranges');
     chartContainer.innerHTML = '';
     
-    Object.keys(teamData).forEach(teamName => {
-        if (teamData[teamName].inChart) {
-            const teamRangeElement = createTeamRangeElement(teamName);
-            chartContainer.appendChild(teamRangeElement);
-        }
-    });
-    
-    sortTeamsByAverage();
-    populateTeamsPool();
+    // Populate random teams
+    populateRandomTeams();
 }
 
 // Handle window resize
@@ -461,10 +714,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Event listeners
     document.getElementById('reset-btn').addEventListener('click', resetRankings);
+    document.getElementById('add-all-btn').addEventListener('click', addAllTeams);
+    document.getElementById('export-btn').addEventListener('click', exportData);
+    document.getElementById('import-btn').addEventListener('click', importData);
+    document.getElementById('import-file').addEventListener('change', handleFileImport);
+    document.getElementById('sort-high-btn').addEventListener('click', () => sortTeamsByRanking('high'));
+    document.getElementById('sort-avg-btn').addEventListener('click', () => sortTeamsByRanking('avg'));
+    document.getElementById('sort-low-btn').addEventListener('click', () => sortTeamsByRanking('low'));
     window.addEventListener('resize', handleResize);
     
-    // View toggle placeholder
-    document.getElementById('view-toggle').addEventListener('click', function() {
-        alert('Tier view coming soon!');
+    // Click elsewhere to clear selection
+    document.addEventListener('click', function(e) {
+        // Check if click was outside of any team range or handle
+        if (!e.target.closest('.team-range') && !e.target.closest('.range-handle')) {
+            setActiveTeam(null);
+        }
+    });
+    
+    // Click on chart area to clear selection
+    document.querySelector('.chart-area').addEventListener('click', function(e) {
+        // Only clear if clicking directly on chart area, not on team elements
+        if (e.target === this || e.target.classList.contains('teams-ranges') || e.target.classList.contains('grid-lines') || e.target.classList.contains('grid-line')) {
+            setActiveTeam(null);
+        }
+    });
+    
+    // Handle Enter key for page title editing
+    document.getElementById('page-title').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur(); // Remove focus to apply the edit
+        }
     });
 });
