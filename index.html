@@ -3,117 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Team Range Ranking</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Green Means Go</title>
+    <script>
+        // Simple client-side routing
+        function route() {
+            const path = window.location.pathname;
+            
+            if (path === '/rankings' || path === '/rankings/') {
+                window.location.href = '/rankings/index.html';
+                return;
+            }
+            
+            // Default to homepage
+            if (path === '/' || path === '/index.html') {
+                window.location.href = '/home.html';
+                return;
+            }
+        }
+        
+        // Route on page load
+        document.addEventListener('DOMContentLoaded', route);
+        
+        // Route on popstate (back/forward navigation)
+        window.addEventListener('popstate', route);
+    </script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-top">
-                <h1 id="page-title" contenteditable="true">NFL Rankings - Week #</h1>
-                <div class="sort-controls">
-                    <button id="sort-avg-btn">Sort by Avg</button>
-                    <button id="sort-high-btn">Sort by High</button>
-                    <button id="sort-low-btn">Sort by Low</button>
-                </div>
-            </div>
-            <div class="random-teams">
-                <h3>Up Next</h3>
-                <div class="random-teams-container" id="random-teams-container"></div>
-                <div class="teams-remaining" id="teams-remaining"></div>
-            </div>
-            <div class="controls">
-                <div class="main-controls">
-                    <button id="add-all-btn">Add All</button>
-                    <button id="reset-btn">Reset</button>
-                </div>
-                <div class="export-controls">
-                    <button id="export-btn">Export</button>
-                    <button id="import-btn">Import</button>
-                </div>
-                <input type="file" id="import-file" accept=".csv" style="display: none;">
-            </div>
-        </header>
-        
-        <div class="chart-container">
-            <div class="y-axis">
-                <div class="y-label" style="top: 0%">1</div>
-                <div class="y-label" style="top: 3.23%">2</div>
-                <div class="y-label" style="top: 6.45%">3</div>
-                <div class="y-label" style="top: 9.68%">4</div>
-                <div class="y-label" style="top: 12.90%">5</div>
-                <div class="y-label" style="top: 16.13%">6</div>
-                <div class="y-label" style="top: 19.35%">7</div>
-                <div class="y-label" style="top: 22.58%">8</div>
-                <div class="y-label" style="top: 25.81%">9</div>
-                <div class="y-label" style="top: 29.03%">10</div>
-                <div class="y-label" style="top: 32.26%">11</div>
-                <div class="y-label" style="top: 35.48%">12</div>
-                <div class="y-label" style="top: 38.71%">13</div>
-                <div class="y-label" style="top: 41.94%">14</div>
-                <div class="y-label" style="top: 45.16%">15</div>
-                <div class="y-label" style="top: 48.39%">16</div>
-                <div class="y-label" style="top: 51.61%">17</div>
-                <div class="y-label" style="top: 54.84%">18</div>
-                <div class="y-label" style="top: 58.06%">19</div>
-                <div class="y-label" style="top: 61.29%">20</div>
-                <div class="y-label" style="top: 64.52%">21</div>
-                <div class="y-label" style="top: 67.74%">22</div>
-                <div class="y-label" style="top: 70.97%">23</div>
-                <div class="y-label" style="top: 74.19%">24</div>
-                <div class="y-label" style="top: 77.42%">25</div>
-                <div class="y-label" style="top: 80.65%">26</div>
-                <div class="y-label" style="top: 83.87%">27</div>
-                <div class="y-label" style="top: 87.10%">28</div>
-                <div class="y-label" style="top: 90.32%">29</div>
-                <div class="y-label" style="top: 93.55%">30</div>
-                <div class="y-label" style="top: 96.77%">31</div>
-                <div class="y-label" style="top: 100%">32</div>
-            </div>
-            
-            <div class="chart-area" id="chart-area">
-                <div class="grid-lines">
-                    <div class="grid-line" style="top: 0%"></div>
-                    <div class="grid-line" style="top: 3.23%"></div>
-                    <div class="grid-line" style="top: 6.45%"></div>
-                    <div class="grid-line" style="top: 9.68%"></div>
-                    <div class="grid-line" style="top: 12.90%"></div>
-                    <div class="grid-line" style="top: 16.13%"></div>
-                    <div class="grid-line" style="top: 19.35%"></div>
-                    <div class="grid-line" style="top: 22.58%"></div>
-                    <div class="grid-line" style="top: 25.81%"></div>
-                    <div class="grid-line" style="top: 29.03%"></div>
-                    <div class="grid-line" style="top: 32.26%"></div>
-                    <div class="grid-line" style="top: 35.48%"></div>
-                    <div class="grid-line" style="top: 38.71%"></div>
-                    <div class="grid-line" style="top: 41.94%"></div>
-                    <div class="grid-line" style="top: 45.16%"></div>
-                    <div class="grid-line" style="top: 48.39%"></div>
-                    <div class="grid-line" style="top: 51.61%"></div>
-                    <div class="grid-line" style="top: 54.84%"></div>
-                    <div class="grid-line" style="top: 58.06%"></div>
-                    <div class="grid-line" style="top: 61.29%"></div>
-                    <div class="grid-line" style="top: 64.52%"></div>
-                    <div class="grid-line" style="top: 67.74%"></div>
-                    <div class="grid-line" style="top: 70.97%"></div>
-                    <div class="grid-line" style="top: 74.19%"></div>
-                    <div class="grid-line" style="top: 77.42%"></div>
-                    <div class="grid-line" style="top: 80.65%"></div>
-                    <div class="grid-line" style="top: 83.87%"></div>
-                    <div class="grid-line" style="top: 87.10%"></div>
-                    <div class="grid-line" style="top: 90.32%"></div>
-                    <div class="grid-line" style="top: 93.55%"></div>
-                    <div class="grid-line" style="top: 96.77%"></div>
-                    <div class="grid-line" style="top: 100%"></div>
-                </div>
-                
-                <div class="teams-ranges" id="teams-ranges"></div>
-            </div>
-        </div>
-        
-        
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a1a; color: white; font-family: Arial, sans-serif;">
+        <p>Loading...</p>
     </div>
-    
-    <script src="script.js"></script>
 </body>
 </html>

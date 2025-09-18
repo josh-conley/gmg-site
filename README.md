@@ -14,7 +14,7 @@ A web-based tool for ranking all 32 NFL teams with range visualization. Drag tea
 
 ## 🚀 Live Demo
 
-Visit: **https://joshconley.github.io/nfl-ranker**
+Visit: **https://joshconley.github.io/gmg-site**
 
 ## 🎮 How to Use
 
@@ -36,8 +36,8 @@ Your rankings are automatically saved to your browser's local storage and will p
 
 ```bash
 # Clone the repository
-git clone https://github.com/joshconley/nfl-ranker.git
-cd nfl-ranker
+git clone https://github.com/joshconley/gmg-site.git
+cd gmg-site
 
 # Start local server
 python3 -m http.server 8000
