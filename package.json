@@ -1,41 +1,14 @@
 {
   "name": "nfl-tier-ranking",
   "version": "1.1.0",
-  "description": "NFL Team Tier Ranking Application",
-  "main": "main.js",
+  "description": "NFL Team Range Ranking Web Application",
+  "main": "index.html",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac"
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000"
   },
-  "keywords": ["nfl", "tier", "ranking", "desktop"],
+  "keywords": ["nfl", "tier", "ranking", "web", "javascript"],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "electron": "^38.1.2",
-    "electron-builder": "^26.0.12"
-  },
-  "build": {
-    "appId": "com.nfl-tier-ranking.app",
-    "productName": "NFL Tier Ranking",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "main.js",
-      "index.html",
-      "style.css",
-      "script.js",
-      "assets/**/*"
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "assets/icon.icns"
-    }
-  }
+  "homepage": "https://joshconley.github.io/nfl-ranker"
 }
