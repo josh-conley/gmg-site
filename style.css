@@ -297,6 +297,7 @@ button:hover {
     flex: 1;
     min-width: 10px;
     max-width: 80px;
+    transition: order 0.3s ease, transform 0.3s ease;
 }
 
 .team-range .team-info {
@@ -351,7 +352,7 @@ button:hover {
     background: linear-gradient(to bottom, rgba(76, 175, 80, 1), rgba(255, 193, 7, 1), rgba(244, 67, 54, 1));
     border-radius: 3px;
     opacity: 1;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, top 0.3s ease, height 0.3s ease;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
@@ -376,7 +377,7 @@ button:hover {
     background: white;
     border: 3px solid rgba(51, 51, 51, 0.4);
     cursor: grab;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, top 0.3s ease;
     opacity: 1;
 }
 

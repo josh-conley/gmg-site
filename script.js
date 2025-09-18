@@ -419,6 +419,13 @@ function sortTeamsByAverage() {
     const container = document.getElementById('teams-ranges');
     const teamElements = Array.from(container.children);
     
+    // Get current positions before sorting
+    const currentPositions = new Map();
+    teamElements.forEach((element, index) => {
+        const rect = element.getBoundingClientRect();
+        currentPositions.set(element, rect.left);
+    });
+    
     // Sort by average ranking (ascending - best ranks first)
     teamElements.sort((a, b) => {
         const teamA = a.getAttribute('data-team');
@@ -435,12 +442,46 @@ function sortTeamsByAverage() {
             element.classList.add('active');
         }
     });
+    
+    // Animate to new positions
+    teamElements.forEach((element) => {
+        const oldPosition = currentPositions.get(element);
+        const newRect = element.getBoundingClientRect();
+        const newPosition = newRect.left;
+        const deltaX = oldPosition - newPosition;
+        
+        if (Math.abs(deltaX) > 1) { // Only animate if there's a meaningful movement
+            // Set initial position to old location
+            element.style.transform = `translateX(${deltaX}px)`;
+            element.style.transition = 'none';
+            
+            // Force reflow
+            element.offsetHeight;
+            
+            // Animate to new position
+            element.style.transition = 'transform 0.3s ease';
+            element.style.transform = 'translateX(0)';
+            
+            // Clean up after animation
+            setTimeout(() => {
+                element.style.transform = '';
+                element.style.transition = '';
+            }, 300);
+        }
+    });
 }
 
 // Sort teams by ranking value
 function sortTeamsByRanking(rankingType = 'avg') {
     const container = document.getElementById('teams-ranges');
     const teamElements = Array.from(container.children);
+    
+    // Get current positions before sorting
+    const currentPositions = new Map();
+    teamElements.forEach((element, index) => {
+        const rect = element.getBoundingClientRect();
+        currentPositions.set(element, rect.left);
+    });
     
     // Sort by the specified ranking (ascending - best ranks first)
     teamElements.sort((a, b) => {
@@ -456,6 +497,33 @@ function sortTeamsByRanking(rankingType = 'avg') {
         const teamName = element.getAttribute('data-team');
         if (teamName === activeTeam) {
             element.classList.add('active');
+        }
+    });
+    
+    // Animate to new positions
+    teamElements.forEach((element) => {
+        const oldPosition = currentPositions.get(element);
+        const newRect = element.getBoundingClientRect();
+        const newPosition = newRect.left;
+        const deltaX = oldPosition - newPosition;
+        
+        if (Math.abs(deltaX) > 1) { // Only animate if there's a meaningful movement
+            // Set initial position to old location
+            element.style.transform = `translateX(${deltaX}px)`;
+            element.style.transition = 'none';
+            
+            // Force reflow
+            element.offsetHeight;
+            
+            // Animate to new position
+            element.style.transition = 'transform 0.3s ease';
+            element.style.transform = 'translateX(0)';
+            
+            // Clean up after animation
+            setTimeout(() => {
+                element.style.transform = '';
+                element.style.transition = '';
+            }, 300);
         }
     });
 }
