@@ -350,7 +350,6 @@ function updateTeamRangePosition(teamName) {
     
     // Update handles (center them on the calculated position)
     const handleHeight = 16; // Standard handle height
-    const avgHandleHeight = 32; // Avg handle is taller
     
     const highHandle = teamElement.querySelector('.range-handle.high');
     const avgHandle = teamElement.querySelector('.range-handle.avg');
@@ -359,6 +358,8 @@ function updateTeamRangePosition(teamName) {
     highHandle.style.top = `${highPos - handleHeight/2}px`;
     highHandle.setAttribute('data-rank', data.high);
     
+    // Get actual height of the avg handle for proper centering
+    const avgHandleHeight = avgHandle.offsetHeight || 48; // fallback to max logo size
     avgHandle.style.top = `${avgPos - avgHandleHeight/2}px`;
     
     // Update avg handle text and reorder elements based on ranking
@@ -421,7 +422,7 @@ function sortTeamsByAverage() {
     
     // Get current positions before sorting
     const currentPositions = new Map();
-    teamElements.forEach((element, index) => {
+    teamElements.forEach((element) => {
         const rect = element.getBoundingClientRect();
         currentPositions.set(element, rect.left);
     });
@@ -478,7 +479,7 @@ function sortTeamsByRanking(rankingType = 'avg') {
     
     // Get current positions before sorting
     const currentPositions = new Map();
-    teamElements.forEach((element, index) => {
+    teamElements.forEach((element) => {
         const rect = element.getBoundingClientRect();
         currentPositions.set(element, rect.left);
     });
